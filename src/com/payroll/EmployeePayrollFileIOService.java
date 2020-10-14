@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 
 public class EmployeePayrollFileIOService {
@@ -44,6 +45,39 @@ public class EmployeePayrollFileIOService {
 		}
 		return entries;
 		
+	}
+	public List<EmployeePayrollData> readData() {
+		List<EmployeePayrollData> returnList = new ArrayList<>();
+		try {
+			Files.lines(new File(PAYROLL_FILE).toPath()).map(line -> line.trim()).forEach(line -> {
+				int check = 1;
+				int id = 0;
+				double salary = 0;
+				String name = "";
+				String data = line.toString();
+				String dataList[] = data.split(",");
+				for (String string : dataList) {
+					if (check == 1) {
+						id = Integer.parseInt(string.replaceAll("id =", ""));
+						check++;
+						continue;
+					}
+					if(check==2) {
+						name = string.replaceAll("name =", "");
+						check++;
+						continue;
+					}
+					if(check==3) {
+						salary = Double.parseDouble(string.replaceAll("salary =", ""));
+						break;
+					}
+				}
+				returnList.add(new EmployeePayrollData(id, name, salary));
+			});
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return returnList;
 	}
 	
 }
